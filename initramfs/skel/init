@@ -8,7 +8,7 @@ rescue_shell() {
 
 perform_update() {
 	echo " * Checking for updates to squashfs."
-	wget -O /tmp/update.txt http://pub.parazyd.cf/tmp/update.txt || {
+	wget -O /tmp/update.txt http://sdk.dyne.org/decode/update.txt || {
 		echo " * Error: Downloading update.txt went wrong"
 		return
 	}
@@ -32,7 +32,7 @@ perform_update() {
 
 	echo " * Checksums differ. Downloading new update..."
 	mv filesystem.squashfs filesystem.squashfs.old
-	wget -O filesystem.squashfs http://pub.parazyd.cf/tmp/filesystem.squashfs || {
+	wget -O filesystem.squashfs http://sdk.dyne.org/decode/filesystem.squashfs || {
 		echo " * Download went wrong. Reverting to old squashfs."
 		echo " * Another update will be tried on next boot."
 		rm -f filesystem.squashfs
