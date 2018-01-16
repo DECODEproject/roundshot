@@ -68,6 +68,7 @@ sleep 2
 
 echo " * setting time from ntp"
 ntpd -q -p pool.ntp.org || rescue_shell
+sleep 2
 
 echo " * mounting mmcblk0p1"
 mkdir -p /mnt/mmc0p1
