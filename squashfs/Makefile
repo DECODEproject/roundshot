@@ -13,7 +13,7 @@ filesystem.squashfs:
 	mksquashfs rootfs $@ -comp xz
 
 clean:
-	rm -rf rootfs $(shell basename -s .tar.gz $(ROOTFS_URL))
+	rm -rf rootfs $(shell basename $(ROOTFS_URL))
 
 distclean: clean
 	rm -f filesystem.squashfs
