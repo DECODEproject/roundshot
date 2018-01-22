@@ -13,7 +13,7 @@ filesystem.squashfs:
 	mksquashfs rootfs $@ -comp xz
 
 clean:
-	rm -rf rootfs $(shell basename $(ROOTFS_URL))
+	rm -rf rootfs overlay $(shell basename $(ROOTFS_URL))
 
 distclean: clean
 	rm -f filesystem.squashfs
