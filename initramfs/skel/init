@@ -1,9 +1,41 @@
 #!/bin/busybox sh
 # Credits to Wizzup for concept and help ❤️
 
+
+
 rescue_shell() {
 	echo "Something went wrong. Dropping to a shell."
 	exec /bin/sh
+}
+
+init_partition() {
+	echo " * (re)partitioning /dev/sda"
+	cat <<EOM | fdisk /dev/sda || rescue_shell
+o
+n
+p
+1
+1
++8192M
+n
+p
+2
+
+
+w
+EOM
+	partprobe /dev/sda
+	echo " * making filesystems..."
+	mkfs.btrfs -f /dev/sda1
+	mkfs.btrfs -f /dev/sda2
+	mkdir -p /mnt/mmc0p1
+	mount -t ext4 /dev/mmcblk0p1 /mnt/mmc0p1
+	mkdir -p /mnt/ssd
+	mount -t btrfs /dev/sda1 /mnt/ssd
+	echo " * copying initial filesystem.squashfs..."
+	cp -v /mnt/mmc0p1/filesystem.squashfs /mnt/ssd
+	echo 1 > /mnt/ssd/.firstboot
+	umount /mnt/ssd /mnt/mmc0p1
 }
 
 perform_update() {
@@ -23,7 +55,7 @@ perform_update() {
 	}
 
 	echo " * Calculating old checksum..."
-	cd /mnt/mmc0p1
+	cd /mnt/ssd
 	oldchecksum="$(sha256sum filesystem.squashfs)"
 	[ "$oldchecksum" = "$newchecksum" ] && {
 		echo " * No difference in checksums. We're up to date! :)"
@@ -70,9 +102,10 @@ echo " * setting time from ntp"
 ntpd -q -p pool.ntp.org || rescue_shell
 sleep 2
 
-echo " * mounting mmcblk0p1"
-mkdir -p /mnt/mmc0p1
-mount -t ext4 /dev/mmcblk0p1 /mnt/mmc0p1
+echo " * mounting the ssd"
+[ -b /dev/sda ] || rescue_shell
+mkdir -p /mnt/ssd
+mount -t btrfs /dev/sda1 /mnt/ssd || init_partition
 
 perform_update 2>&1 | tee update.log
 
@@ -81,7 +114,7 @@ mkdir -p /mnt/rw
 mkdir -p /mnt/overlay
 
 echo " * mounting squashfs to /mnt/ro"
-mount -t squashfs /mnt/mmc0p1/filesystem.squashfs /mnt/ro
+mount -t squashfs /mnt/ssd/filesystem.squashfs /mnt/ro
 
 storage=$(egrep -o 'storage[^ ]*' /proc/cmdline | sed 's/storage=//')
 echo " * mounting $storage to /mnt/rw"
