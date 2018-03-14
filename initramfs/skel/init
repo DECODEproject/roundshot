@@ -9,8 +9,10 @@ rescue_shell() {
 }
 
 init_partition() {
+	umount /dev/sda1
+	umount /dev/sda2
 	echo " * (re)partitioning /dev/sda"
-	cat <<EOM | fdisk /dev/sda || rescue_shell
+	cat <<EOM | fdisk /dev/sda
 o
 n
 p
@@ -25,6 +27,7 @@ p
 w
 EOM
 	partprobe /dev/sda
+	sleep 1
 	echo " * making filesystems..."
 	mkfs.btrfs -f /dev/sda1
 	mkfs.btrfs -f /dev/sda2
@@ -35,7 +38,7 @@ EOM
 	echo " * copying initial filesystem.squashfs..."
 	cp -v /mnt/mmc0p1/filesystem.squashfs /mnt/ssd
 	echo 1 > /mnt/ssd/.firstboot
-	umount /mnt/ssd /mnt/mmc0p1
+	umount /mnt/mmc0p1
 }
 
 perform_update() {
@@ -103,9 +106,11 @@ ntpd -q -p pool.ntp.org || rescue_shell
 sleep 2
 
 echo " * mounting the ssd"
-[ -b /dev/sda ] || rescue_shell
 mkdir -p /mnt/ssd
-mount -t btrfs /dev/sda1 /mnt/ssd || init_partition
+[ -b /dev/sda ]  || rescue_shell
+[ -b /dev/sda1 ] || init_partition
+mount -t btrfs /dev/sda1 /mnt/ssd || rescue_shell
+[ -f /mnt/ssd/.firstboot ] || init_partition
 
 perform_update 2>&1 | tee update.log
 
