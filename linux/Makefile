@@ -23,8 +23,8 @@ build-$(LINUX_TYPE):
 
 install:
 	@mkdir -p build
-	cp -f linux-$(LINUX_TYPE)/arch/arm/boot/zImage build/zImage.$(LINUX_TYPE)
-	cp -f linux-$(LINUX_TYPE)/arch/arm/boot/dts/$(ARM_DTB) build/$(ARM_DTB).$(LINUX_TYPE)
+	cp -f linux-$(LINUX_TYPE)/arch/arm/boot/zImage build/zImage
+	cp -f linux-$(LINUX_TYPE)/arch/arm/boot/dts/$(ARM_DTB) build/$(ARM_DTB)
 
 clean:
 	rm -rf linux-*

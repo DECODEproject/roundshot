@@ -1,6 +1,6 @@
 # See LICENSE file for copyright and license details
 
-U_BOOT_VERSION = v2018.01-rc2
+U_BOOT_VERSION = v2018.03
 U_BOOT_URL = git://git.denx.de/u-boot.git
 
 ARM_DEFCONFIG = A20-OLinuXino-Lime2_defconfig
