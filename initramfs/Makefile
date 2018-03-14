@@ -3,7 +3,7 @@
 
 include config.mk
 
-all: dirs busybox gnupg initramfs.cpio.bz2
+all: dirs busybox gnupg btrfs initramfs.cpio.bz2
 
 dirs:
 	mkdir -p build
@@ -33,7 +33,17 @@ ifeq ($(GNUPG),1)
 	ar x $(shell basename $(GNUPG_URL))
 	tar xf data.tar.xz
 	cp -f usr/bin/gpgv-static $(PWD)/build/bin/gpgv
-	rm -rf usr data.tar.xz control.tar.xz debian-binary
+	rm -rf usr data.tar.xz control.tar.gz debian-binary
+endif
+
+btrfs:
+ifeq ($(GNUPG),1)
+	wget -c $(BTRFS_URL)
+	wget -c $(BTRFSMKFS_URL)
+	mv btrfs.static $(PWD)/build/bin/btrfs
+	mv mkfs.btrfs.static $(PWD)/build/bin/mkfs.btrfs
+	chmod 755 $(PWD)/build/bin/btrfs
+	chmod 755 $(PWD)/build/bin/mkfs.btrfs
 endif
 
 initramfs.cpio.bz2:
