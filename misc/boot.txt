@@ -1,4 +1,4 @@
-setenv bootargs console=ttyS0,115200 root=/dev/ram0 rootwait panic=10 storage=/dev/mmcblk0p2 ${extra}
+setenv bootargs console=ttyS0,115200 root=/dev/ram0 rootwait panic=10 storage=/dev/sda2 ${extra}
 load mmc 0:1 0x43000000 ${fdtfile}
 load mmc 0:1 0x42000000 zImage
 load mmc 0:1 0x44000000 initramfs.cpio.bz2.img
