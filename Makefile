@@ -15,6 +15,8 @@ dist: all
 	cp -fra initramfs/initramfs.cpio.bz2 dist
 	cp -f squashfs/filesystem.squashfs dist
 	cp -f u-boot/build/u-boot-sunxi-with-spl.bin dist
+	cp -f misc/prepimg.sh dist
+	cd dist && ./prepimg.sh
 
 clean:
 	make -C toolchain clean
