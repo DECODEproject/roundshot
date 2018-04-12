@@ -38,7 +38,7 @@ EOM
 	echo " * copying initial filesystem.squashfs..."
 	cp -v /mnt/mmc0p1/filesystem.squashfs /mnt/ssd
 	echo 1 > /mnt/ssd/.firstboot
-	umount /mnt/mmc0p1
+	#umount /mnt/mmc0p1
 }
 
 perform_update() {
