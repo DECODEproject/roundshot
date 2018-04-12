@@ -37,7 +37,7 @@ ifeq ($(GNUPG),1)
 endif
 
 btrfs:
-ifeq ($(GNUPG),1)
+ifeq ($(BTRFS),1)
 	wget -c $(BTRFS_URL)
 	wget -c $(BTRFSMKFS_URL)
 	mv btrfs.static $(PWD)/build/bin/btrfs
