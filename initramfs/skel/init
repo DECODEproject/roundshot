@@ -4,13 +4,18 @@
 
 
 rescue_shell() {
-	echo "Something went wrong. Dropping to a shell."
+	if [ -n "$1" ]; then
+		echo "$*"
+	else
+		echo "Something went wrong."
+	fi
+	echo "Dropping to a shell."
 	exec /bin/sh
 }
 
 init_partition() {
-	umount /dev/sda1
-	umount /dev/sda2
+	umount /dev/sda1 || true
+	umount /dev/sda2 || true
 	echo " * (re)partitioning /dev/sda"
 	cat <<EOM | fdisk /dev/sda
 o
@@ -38,7 +43,7 @@ EOM
 	echo " * copying initial filesystem.squashfs..."
 	cp -v /mnt/mmc0p1/filesystem.squashfs /mnt/ssd
 	echo 1 > /mnt/ssd/.firstboot
-	#umount /mnt/mmc0p1
+	umount /mnt/mmc0p1
 }
 
 perform_update() {
@@ -107,12 +112,12 @@ sleep 2
 
 echo " * mounting the ssd"
 mkdir -p /mnt/ssd
-[ -b /dev/sda ]  || rescue_shell
+[ -b /dev/sda ]  || rescue_shell "/dev/sda not found. is the SSD connected?"
 [ -b /dev/sda1 ] || init_partition
 mount -t btrfs /dev/sda1 /mnt/ssd || rescue_shell
 [ -f /mnt/ssd/.firstboot ] || init_partition
 
-perform_update 2>&1 | tee update.log
+perform_update 2>&1 | tee decode-update.log
 
 mkdir -p /mnt/ro
 mkdir -p /mnt/rw
@@ -130,12 +135,12 @@ mkdir -p /mnt/rw/work
 echo " * mounting overlayfs to /mnt/overlay"
 mount -t overlay -o lowerdir=/mnt/ro,upperdir=/mnt/rw/upper,workdir=/mnt/rw/work overlay /mnt/overlay
 
-[ -f update.log ] && {
+[ -f decode-update.log ] && {
 	mkdir -p /mnt/rw/upper/var/log
-	[ -f /mnt/rw/upper/var/log/update.log ] && {
-		mv /mnt/rw/upper/var/log/update.log /mnt/rw/upper/var/log/update.log.1
+	[ -f /mnt/rw/upper/var/log/decode-update.log ] && {
+		mv /mnt/rw/upper/var/log/decode-update.log /mnt/rw/upper/var/log/decode-update.log.1
 	}
-	cp -f update.log /mnt/rw/upper/var/log/update.log
+	cp -f decode-update.log /mnt/rw/upper/var/log/decode-update.log
 }
 
 mount --move /dev /mnt/overlay/dev || rescue_shell
