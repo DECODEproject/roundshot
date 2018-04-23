@@ -103,7 +103,7 @@ ip link set eth0 up || rescue_shell
 sleep 2
 
 echo " * requesting dhcp"
-udhcpc || rescue_shell
+udhcpc -t 5 -b || rescue_shell
 sleep 2
 
 echo " * setting time from ntp"
