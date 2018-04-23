@@ -121,6 +121,11 @@ mount -t btrfs /dev/sda1 /mnt/ssd || rescue_shell
 
 perform_update 2>&1 | tee decode-update.log
 
+mkdir -p /mnt/mmc0p1
+mount -t ext4 /dev/mmcblk0p1 /mnt/mmc0p1
+cp -f decode-update.log /mnt/mmc0p1
+umount /mnt/mmc0p1
+
 mkdir -p /mnt/ro
 mkdir -p /mnt/rw
 mkdir -p /mnt/overlay
